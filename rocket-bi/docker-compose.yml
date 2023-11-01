@@ -1,0 +1,66 @@
+# https://github.com/datainsider-co/rocket-bi/tree/main/docker
+
+version: "3"
+
+services:
+  mysql:
+    image: datainsiderco/rocket-mysql
+    container_name: rocket-mysql
+    restart: always
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+    extra_hosts:
+      - "workstation:host-gateway"
+
+  ssdb:
+    image: datainsiderco/rocket-ssdb
+    container_name: rocket-ssdb
+    volumes:
+      - ./ssdb/data:/var/lib/ssdb/data
+    restart: always
+    extra_hosts:
+      - "workstation:host-gateway"
+
+  rocket-bi-server:
+    image: datainsiderco/rocket-bi-server:main
+    container_name: rocket-bi-server
+    restart: always
+    environment:
+      NAME: rocket-bi-server
+      MODE: production
+    volumes:
+      - ./rocket-bi-server/logs:/app/logs
+      - biservice-mapdata:/app/mapdata
+    depends_on:
+      - mysql
+      - ssdb
+    extra_hosts:
+      - "workstation:host-gateway"
+
+  rocket-bi-web:
+    image: datainsiderco/rocket-bi-web:main
+    container_name: rocket-bi-web
+    restart: always
+    extra_hosts:
+      - "workstation:host-gateway"
+
+  nginx:
+    image: datainsiderco/rocket-nginx
+    container_name: rocket-nginx
+    restart: always
+    ports:
+      - 5050:80
+    volumes:
+      - ./nginx/log/:/var/log/nginx/
+      - biservice-mapdata:/var/www/html/public/static/mapdata
+    depends_on:
+      - rocket-bi-server
+      - rocket-bi-web
+    extra_hosts:
+      - "workstation:host-gateway"
+
+volumes:
+  biservice-mapdata:
+
+networks:
+  rocket_network:
