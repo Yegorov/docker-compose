@@ -1,0 +1,15 @@
+# docker-compose -f docker-compose-kibana7.yml up
+# docker-compose -f docker-compose-kibana7.yml exec kibana bash
+version: "3"
+
+services:
+  kibana: 
+    image: kibana:7.1.1 # kibana:7.17.14
+    container_name: kibana7
+    restart: always
+    ports:
+      - 5601:5601
+    extra_hosts:
+      - "workstation:host-gateway"
+      - "elasticsearch:host-gateway"
+    # network_mode: "host"
