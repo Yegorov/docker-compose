@@ -1,0 +1,11 @@
+version: "3"
+services:
+  elasticvue:
+    image: cars10/elasticvue:1.0.0
+    container_name: elasticvue
+    restart: always
+    ports:
+      - 9080:8080
+    # extra_hosts:
+    #   - "workstation:host-gateway"
+    # network_mode: "host"
